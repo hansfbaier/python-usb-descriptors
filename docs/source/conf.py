@@ -24,14 +24,14 @@ release = ''
 
 templates_path = ['_templates']
 exclude_patterns = ['build']
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
 master_doc = 'index'
 language = 'en'
 exclude_patterns = []
 pygments_style = None
 
 extensions = [
-    'recommonmark',
+    'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
