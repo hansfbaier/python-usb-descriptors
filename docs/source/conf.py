@@ -1,4 +1,6 @@
-import os, pkg_resources, sys, time
+import os, sys, time
+from importlib import metadata
+
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../usb_protocol'))
 
@@ -14,7 +16,7 @@ project = 'usb_protocol'
 copyright = time.strftime('2021-%Y, Great Scott Gadgets')
 author = 'Great Scott Gadgets'
 
-version = pkg_resources.get_distribution('usb_protocol').version
+version = metadata.version("usb_protocol")
 release = ''
 
 
