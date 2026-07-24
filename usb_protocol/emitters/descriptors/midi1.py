@@ -28,8 +28,17 @@ class MidiOutJackDescriptorEmitter(ComplexDescriptorEmitter):
         sourceDescriptor.BaSourcePin = sourcePin
         self.add_subordinate_descriptor(sourceDescriptor)
 
+    def __setattr__(self, name, value):
+        if name == "iJack":
+            self._iJack = value
+        else:
+            return super().__setattr__(name, value)
+
     def _pre_emit(self):
-        self.add_subordinate_descriptor(MidiOutJackDescriptorFootEmitter())
+        foot = MidiOutJackDescriptorFootEmitter()
+        if hasattr(self, "_iJack"):
+            foot.iJack = self._iJack
+        self.add_subordinate_descriptor(foot)
         # Figure out the total length of our descriptor, including subordinates.
         subordinate_length = sum(len(sub) for sub in self._subordinates)
         self.bLength = subordinate_length + self.DESCRIPTOR_FORMAT.sizeof()
