@@ -3,13 +3,13 @@ requires = ["setuptools>=64", "setuptools-git-versioning<2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "usb-protocol"
+name = "usb-descriptors"
 description = "Python library providing utilities, data structures, constants, parsers, and tools for working with the USB protocol."
 license = { text = "BSD" }
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
-    {name = "Great Scott Gadgets", email = "dev@greatscottgadgets.com"},
+    {name = "Hans Baier", email = "foss@hans-baier.de"},
 ]
 
 classifiers = [
@@ -43,7 +43,7 @@ usb_protocol = "usb_protocol"
 
 [tool.setuptools-git-versioning]
 enabled = true
-starting_version = "0.9.0"
+starting_version = "0.2.0"
 
 [tool.pdm.scripts]
 test.cmd = "python -m unittest discover -t . -v"
