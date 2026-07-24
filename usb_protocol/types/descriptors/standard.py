@@ -171,7 +171,7 @@ InterfaceAssociationDescriptor = DescriptorFormat(
     "bFunctionClass"      / DescriptorField("Class code"),
     "bFunctionSubClass"   / DescriptorField("Subclass code"),
     "bFunctionProtocol"   / DescriptorField("Protocol code"),
-    "iFunction"           / DescriptorField("Index of string descriptor describing this function."),
+    "iFunction"           / DescriptorField("Index of string descriptor describing this function.", default=0),
 )
 
 #

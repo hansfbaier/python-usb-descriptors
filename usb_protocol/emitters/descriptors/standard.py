@@ -35,6 +35,17 @@ def get_string_descriptor(string):
 
 # ... and complex emitters.
 
+class InterfaceAssociationDescriptorEmitter(ComplexDescriptorEmitter):
+    """ Emitter that creates an interface association descriptor. """
+
+    DESCRIPTOR_FORMAT = InterfaceAssociationDescriptor
+
+    def _pre_emit(self):
+        # Ensure that our function string is an index, if we can.
+        if self._collection and hasattr(self, 'iFunction'):
+            self.iFunction = self._collection.ensure_string_field_is_index(self.iFunction)
+
+
 class EndpointDescriptorEmitter(ComplexDescriptorEmitter):
     """ Emitter that creates an InterfaceDescriptor. """
 
@@ -106,6 +117,26 @@ class ConfigurationDescriptorEmitter(ComplexDescriptorEmitter):
     """ Emitter that creates a configuration descriptor. """
 
     DESCRIPTOR_FORMAT = ConfigurationDescriptor
+
+    @contextmanager
+    def InterfaceAssociationDescriptor(self):
+        """ Context manager that allows addition of a subordinate interface association descriptor.
+
+        It can be used with a `with` statement; and yields an InterfaceAssociationDescriptorEmitter
+        that can be populated:
+
+            with configuration.InterfaceAssociationDescriptor() as d:
+                d.bFirstInterface = 0
+                d.bInterfaceCount = 2
+                [snip]
+
+        This adds the relevant descriptor, automatically.
+        """
+        descriptor = InterfaceAssociationDescriptorEmitter(collection=self._collection)
+        yield descriptor
+
+        self.add_subordinate_descriptor(descriptor)
+
 
     @contextmanager
     def InterfaceDescriptor(self):
@@ -540,6 +571,15 @@ class EmitterTests(unittest.TestCase):
         with collection.ConfigurationDescriptor() as c:
             c.bConfigurationValue = 1
 
+            with c.InterfaceAssociationDescriptor() as ia:
+                ia.bFirstInterface = 1
+                ia.bInterfaceCount = 1
+                ia.bFunctionClass = 0xa
+                ia.bFunctionSubClass = 0xb
+                ia.bFunctionProtocol = 0xc
+                ia.iFunction = "Test IAD"
+
+
             with c.InterfaceDescriptor() as i:
                 i.bInterfaceNumber = 1
 
@@ -552,9 +592,9 @@ class EmitterTests(unittest.TestCase):
 
         results = list(collection)
 
-        # We should wind up with four descriptor entries, as our endpoint/interface descriptors are
+        # We should wind up with six descriptor entries, as our endpoint/interface descriptors are
         # included in our configuration descriptor.
-        self.assertEqual(len(results), 5)
+        self.assertEqual(len(results), 6)
 
         # Supported languages string.
         self.assertIn((3, 0, b'\x04\x03\x09\x04'), results)
@@ -563,11 +603,14 @@ class EmitterTests(unittest.TestCase):
         self.assertIn((3, 1, b'\x1a\x03T\x00e\x00s\x00t\x00 \x00C\x00o\x00m\x00p\x00a\x00n\x00y\x00'), results)
         self.assertIn((3, 2, b'\x1a\x03T\x00e\x00s\x00t\x00 \x00P\x00r\x00o\x00d\x00u\x00c\x00t\x00'), results)
 
+        # IAD function string
+        self.assertIn((3, 3, b'\x12\x03T\x00e\x00s\x00t\x00 \x00I\x00A\x00D\x00'), results)
+
         # Device descriptor.
         self.assertIn((1, 0, b'\x12\x01\x00\x02\x00\x00\x00@\xad\xde\xef\xbe\x00\x00\x01\x02\x00\x01'), results)
 
         # Configuration descriptor, with subordinates.
-        self.assertIn((2, 0, b'\t\x02 \x00\x01\x01\x00\x80\xfa\t\x04\x01\x00\x02\xff\xff\xff\x00\x07\x05\x81\x02@\x00\xff\x07\x05\x01\x02@\x00\xff'), results)
+        self.assertIn((2, 0, b'\t\x02\x28\x00\x01\x01\x00\x80\xfa\x08\x0b\x01\x01\x0a\x0b\x0c\x03\t\x04\x01\x00\x02\xff\xff\xff\x00\x07\x05\x81\x02@\x00\xff\x07\x05\x01\x02@\x00\xff'), results)
 
 
     def test_empty_descriptor_collection(self):
