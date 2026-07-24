@@ -5,7 +5,7 @@ setup(
     # Vitals
     name='usb_descriptors',
     license='BSD',
-    url='https://github.com/amaranth-farm/python-usb-descriptors',
+    url='https://github.com/hansfbaier/python-usb-descriptors',
     author='Hans Baier',
     author_email='foss@hans-baier.de',
     description='python library providing utilities, data structures, constants, parsers, and tools for working with USB data',
